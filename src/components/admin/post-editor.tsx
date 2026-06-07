@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type ChangeEvent } from "react";
 import type { Post, PostStatus } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Bold, Heading2, Italic, List, Quote, Save } from "lucide-react";
+import Image from "@tiptap/extension-image";
+import { Bold, FileUp, Heading2, ImageIcon, Italic, List, Paperclip, Quote, Save, Video } from "lucide-react";
+import { AttachmentNode, VideoNode } from "@/lib/editor-media";
 
 const statuses: Array<{ value: PostStatus; label: string }> = [
   { value: "DRAFT", label: "Draft" },
@@ -25,7 +27,11 @@ function slugify(value: string) {
 
 export function PostEditor({ post }: { post?: Post | null }) {
   const router = useRouter();
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: post?.title ?? "",
     slug: post?.slug ?? "",
@@ -41,6 +47,14 @@ export function PostEditor({ post }: { post?: Post | null }) {
     immediatelyRender: false,
     extensions: [
       StarterKit,
+      Image.configure({
+        allowBase64: false,
+        HTMLAttributes: {
+          loading: "lazy",
+        },
+      }),
+      VideoNode,
+      AttachmentNode,
       Placeholder.configure({
         placeholder: "Write the entry in an editorial, WYSIWYG canvas...",
       }),
@@ -55,6 +69,65 @@ export function PostEditor({ post }: { post?: Post | null }) {
   });
 
   const disabled = useMemo(() => !form.title || !form.slug || saving, [form.title, form.slug, saving]);
+
+  async function uploadFile(file: File, kind: "image" | "video" | "attachment") {
+    setUploading(kind);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/admin/uploads", {
+      method: "POST",
+      body: formData,
+    });
+
+    setUploading(null);
+
+    if (!response.ok) {
+      alert("Upload failed. Please try a smaller file or check the server.");
+      return null;
+    }
+
+    return (await response.json()) as {
+      url: string;
+      name: string;
+      mimeType: string;
+      size: number;
+      kind: "image" | "video" | "attachment";
+    };
+  }
+
+  async function handleFileSelect(event: ChangeEvent<HTMLInputElement>, kind: "image" | "video" | "attachment") {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || !editor) return;
+
+    const uploaded = await uploadFile(file, kind);
+    if (!uploaded) return;
+
+    if (kind === "image") {
+      editor.chain().focus().insertContent({ type: "image", attrs: { src: uploaded.url, alt: uploaded.name } }).run();
+      return;
+    }
+
+    if (kind === "video") {
+      editor.chain().focus().insertContent({ type: "videoBlock", attrs: { src: uploaded.url, title: uploaded.name } }).run();
+      return;
+    }
+
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "attachment",
+        attrs: {
+          href: uploaded.url,
+          title: uploaded.name,
+          mimeType: uploaded.mimeType,
+          size: uploaded.size,
+        },
+      })
+      .run();
+  }
 
   async function save() {
     setSaving(true);
@@ -115,6 +188,36 @@ export function PostEditor({ post }: { post?: Post | null }) {
           <button type="button" title="List" onClick={() => editor?.chain().focus().toggleBulletList().run()} className="p-2 hover:bg-stone-100">
             <List size={17} />
           </button>
+          <span className="mx-1 h-9 w-px bg-stone-200" />
+          <button type="button" title="Upload image" onClick={() => imageInputRef.current?.click()} className="p-2 hover:bg-stone-100">
+            {uploading === "image" ? <FileUp size={17} /> : <ImageIcon size={17} />}
+          </button>
+          <button type="button" title="Upload video" onClick={() => videoInputRef.current?.click()} className="p-2 hover:bg-stone-100">
+            {uploading === "video" ? <FileUp size={17} /> : <Video size={17} />}
+          </button>
+          <button type="button" title="Upload attachment" onClick={() => attachmentInputRef.current?.click()} className="p-2 hover:bg-stone-100">
+            {uploading === "attachment" ? <FileUp size={17} /> : <Paperclip size={17} />}
+          </button>
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(event) => void handleFileSelect(event, "image")}
+          />
+          <input
+            ref={videoInputRef}
+            type="file"
+            accept="video/*"
+            className="hidden"
+            onChange={(event) => void handleFileSelect(event, "video")}
+          />
+          <input
+            ref={attachmentInputRef}
+            type="file"
+            className="hidden"
+            onChange={(event) => void handleFileSelect(event, "attachment")}
+          />
         </div>
         <EditorContent editor={editor} />
       </section>

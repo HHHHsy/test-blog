@@ -45,3 +45,47 @@ body {
   font-style: italic;
   line-height: 1.4;
 }
+
+.prose img {
+  margin: 2.5rem 0;
+  width: 100%;
+  max-height: 720px;
+  object-fit: cover;
+  border: 1px solid #e7e2df;
+  background: #eee9e5;
+}
+
+.prose figure[data-media="video"] {
+  margin: 2.5rem 0;
+}
+
+.prose video {
+  display: block;
+  width: 100%;
+  max-height: 720px;
+  border: 1px solid #e7e2df;
+  background: #111;
+}
+
+.prose a[data-attachment] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem 0;
+  border: 1px solid #d8d1cc;
+  background: #fbf9f9;
+  padding: 1rem 1.1rem;
+  color: #1b1c1c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.prose a[data-attachment]::after {
+  content: "Download";
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #78716c;
+}

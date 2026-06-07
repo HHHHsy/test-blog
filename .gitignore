@@ -25,6 +25,8 @@
 *.pem
 /.local/
 /stitch-assets/
+/public/uploads/*
+!/public/uploads/.gitkeep
 
 # debug
 npm-debug.log*
