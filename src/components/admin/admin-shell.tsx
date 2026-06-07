@@ -9,7 +9,7 @@ const items = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/posts", label: "Posts", icon: Newspaper },
   { href: "/admin/pages", label: "Pages", icon: FileText },
-  { href: "/", label: "View Site", icon: Settings },
+  { href: "/", label: "View Website", icon: Settings, external: true },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -27,7 +27,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <nav className="mt-10 space-y-1">
           {items.map((item) => {
             const Icon = item.icon;
-            const active = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+            const active =
+              !item.external &&
+              (pathname === item.href || (item.href !== "/admin" && pathname.startsWith(`${item.href}/`)));
             return (
               <Link
                 key={item.href}
