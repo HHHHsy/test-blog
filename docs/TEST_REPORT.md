@@ -1,0 +1,193 @@
+# ELÉGANCE Automated Premium Journal 测试报告
+
+## 1. 测试概述
+
+- 项目名称：ELÉGANCE Automated Premium Journal
+- 测试日期：2026-06-07
+- 测试对象：Next.js 前台站点、后台 CMS、后台 API、AWS 部署环境
+- 测试版本：`8d6b31c Fix admin nav active state`
+- 线上地址：http://52.37.190.58
+- 部署实例：`i-0b6d544c1307ce5b7`
+- 数据库：AWS RDS PostgreSQL `elegance-postgres-20260607`
+
+## 2. 测试环境
+
+| 项目 | 信息 |
+| --- | --- |
+| 本地系统 | macOS |
+| Node.js | 项目使用 Next.js 16.2.7，React 19.2.4 |
+| 包管理 | npm |
+| 数据库 | PostgreSQL on AWS RDS |
+| 部署 | AWS EC2 + nginx + systemd |
+| 浏览器验证 | Codex 内置浏览器自动化、curl |
+
+## 3. 测试范围
+
+### 已覆盖
+
+- 本地 lint
+- 本地生产构建
+- 前台页面访问
+- Journal 列表和详情页访问
+- 后台鉴权
+- 后台 Dashboard
+- 后台 Posts 列表
+- 后台导航 active 状态
+- 后台 API 鉴权
+- AWS 原地部署验证
+
+### 未完全覆盖
+
+- 大量数据下的分页和性能测试
+- 文件上传、图片附件、视频附件测试
+- DOM 登录页测试
+- 多用户权限测试
+- 压力测试和安全扫描
+
+## 4. 构建与静态检查
+
+| 用例编号 | 测试项 | 命令 | 结果 |
+| --- | --- | --- | --- |
+| BUILD-001 | ESLint 检查 | `npm run lint` | 通过 |
+| BUILD-002 | Next.js 生产构建 | `npm run build` | 通过 |
+
+构建输出确认存在以下关键路由：
+
+- `/`
+- `/journal`
+- `/journal/[slug]`
+- `/about`
+- `/contact`
+- `/admin`
+- `/admin/posts`
+- `/admin/posts/new`
+- `/admin/posts/[id]/edit`
+- `/admin/pages`
+- `/api/admin/posts`
+- `/api/admin/posts/[id]`
+
+## 5. 前台功能测试
+
+| 用例编号 | 页面/功能 | 步骤 | 预期结果 | 实际结果 | 状态 |
+| --- | --- | --- | --- | --- | --- |
+| FE-001 | 首页访问 | 打开 `http://52.37.190.58/` | 返回 200，页面正常展示 | 返回 200 | 通过 |
+| FE-002 | 首页无 admin 入口 | 检查首页导航和链接 | 不存在 `/admin` 导航入口 | 未发现 `/admin` 链接 | 通过 |
+| FE-003 | Journal 列表 | 打开 `/journal` | 展示已发布文章列表 | 已验证可访问 | 通过 |
+| FE-004 | Journal 详情 | 打开已发布文章 slug | 展示文章标题、摘要、正文 | 已验证可访问 | 通过 |
+| FE-005 | 前台导航 | 检查 Journal/About/Contact | 导航可见且样式正常 | 浏览器自动化验证通过 | 通过 |
+
+## 6. 后台鉴权测试
+
+| 用例编号 | 测试项 | 步骤 | 预期结果 | 实际结果 | 状态 |
+| --- | --- | --- | --- | --- | --- |
+| AUTH-001 | 未认证访问后台 | 请求 `/admin` | 返回 401 | 返回 401 | 通过 |
+| AUTH-002 | 错误密码访问后台 | 使用 `admin/wrong` 请求 `/admin` | 返回 401 | 返回 401 | 通过 |
+| AUTH-003 | 正确账号访问后台 | 使用 `admin/admin123` 请求 `/admin` | 返回 200 | 返回 200 | 通过 |
+| AUTH-004 | 未认证访问后台 API | 请求 `/api/admin/posts` | 返回 401 | 返回 401 | 通过 |
+| AUTH-005 | 正确账号访问后台 API | 使用 `admin/admin123` 请求 `/api/admin/posts` | 返回 200 | 返回 200 | 通过 |
+
+备注：当前鉴权方式为 Basic Auth，会触发浏览器原生登录弹窗。用户已提出需要改成 DOM 登录页面，该项属于后续待实现需求。
+
+## 7. 后台 CMS 功能测试
+
+| 用例编号 | 页面/功能 | 步骤 | 预期结果 | 实际结果 | 状态 |
+| --- | --- | --- | --- | --- | --- |
+| CMS-001 | Dashboard | 登录后打开 `/admin` | 展示统计卡片和最近文章 | 已展示 | 通过 |
+| CMS-002 | Posts 列表 | 登录后打开 `/admin/posts` | 展示文章表格 | 已展示 | 通过 |
+| CMS-003 | 新建文章页 | 打开 `/admin/posts/new` | 展示编辑器和状态字段 | 已实现 | 通过 |
+| CMS-004 | 编辑文章页 | 打开 `/admin/posts/[id]/edit` | 展示当前文章信息并可编辑 | 已实现 | 通过 |
+| CMS-005 | 状态字段 | 检查 Draft/Pending/Published/Offline | 状态选项可用 | 已实现 | 通过 |
+| CMS-006 | 富文本基础格式 | 检查加粗、斜体、标题、引用、列表按钮 | 按钮可见且接入 Tiptap | 已实现 | 通过 |
+
+## 8. 后台导航测试
+
+| 用例编号 | 路由 | 预期 active 项 | 结果 |
+| --- | --- | --- | --- |
+| NAV-001 | `/admin` | Dashboard | 通过 |
+| NAV-002 | `/admin/posts` | Posts | 通过 |
+| NAV-003 | `/admin/pages` | Pages | 通过 |
+| NAV-004 | 任意后台路由 | View Website 不应 active | 通过 |
+
+线上验证片段显示：
+
+- `/admin/posts` 下，`Posts` 链接包含 `bg-black text-white`。
+- `/admin/posts` 下，`View Website` 链接保持 `text-stone-600`。
+- `/admin` 下，`Dashboard` 链接包含 `bg-black text-white`。
+- `/admin` 下，`View Website` 链接保持 `text-stone-600`。
+
+## 9. 数据库与内容发布测试
+
+| 用例编号 | 测试项 | 预期结果 | 实际结果 | 状态 |
+| --- | --- | --- | --- | --- |
+| DB-001 | RDS 连接 | 应用可连接 PostgreSQL | 已连接 | 通过 |
+| DB-002 | Prisma schema 同步 | `Post` 和 `PageContent` 表结构同步 | 线上部署日志显示已同步 | 通过 |
+| DB-003 | 文章读取 | 前台读取 `PUBLISHED` 数据 | 已验证 | 通过 |
+| DB-004 | 后台读取 | 后台读取全部状态文章 | 已验证 | 通过 |
+| DB-005 | 写入能力 | API 支持创建和更新文章 | 已实现并曾通过浏览器自动化创建测试文章 | 通过 |
+
+## 10. 部署测试
+
+| 用例编号 | 测试项 | 步骤 | 预期结果 | 实际结果 | 状态 |
+| --- | --- | --- | --- | --- | --- |
+| DEPLOY-001 | AWS 实例状态 | 查询 `i-0b6d544c1307ce5b7` | running | running | 通过 |
+| DEPLOY-002 | 原地部署 | 使用 SSM 在当前实例部署 | 不新建 EC2，原实例更新成功 | 成功 | 通过 |
+| DEPLOY-003 | 构建产物启动 | systemd 启动 `elegance-journal` | 服务 active | active | 通过 |
+| DEPLOY-004 | nginx 代理 | 访问 80 端口 | 正常代理到 Next.js | 返回 200 | 通过 |
+| DEPLOY-005 | IP 保持 | 部署后访问地址不变 | 仍为 `52.37.190.58` | 保持不变 | 通过 |
+
+## 11. 浏览器自动化测试
+
+| 用例编号 | 测试项 | 验证内容 | 结果 |
+| --- | --- | --- | --- |
+| BROWSER-001 | 首页视觉 smoke test | 打开线上首页，读取 H1、导航链接 | 通过 |
+| BROWSER-002 | 首页无 admin | 检查页面是否存在 `/admin` 链接 | 不存在，通过 |
+| BROWSER-003 | 导航内容 | Journal、About、Contact 可见 | 通过 |
+
+浏览器自动化读取结果摘要：
+
+```json
+{
+  "url": "http://52.37.190.58/",
+  "h1": "The quiet architecture of modern elegance.",
+  "hasAdminHref": false,
+  "navLinks": ["Journal", "About", "Contact"]
+}
+```
+
+## 12. 缺陷与风险
+
+| 编号 | 问题 | 严重级别 | 状态 | 建议 |
+| --- | --- | --- | --- | --- |
+| RISK-001 | 后台登录是 Basic Auth，不是 DOM 登录页 | 中 | 待修复 | 实现 `/login` 页面、cookie session、logout |
+| RISK-002 | 富文本尚不支持图片、视频、附件插入 | 高 | 待修复 | 增加 Tiptap Image/Video/File 扩展和 S3 上传 |
+| RISK-003 | 生产账号密码硬编码在 `src/proxy.ts` | 中 | 待优化 | 改为环境变量或数据库用户表 |
+| RISK-004 | 删除文章 API 已有，UI 缺少删除入口和确认 | 低 | 待完善 | 在表格操作区增加删除按钮和二次确认 |
+| RISK-005 | 未执行压力测试和安全扫描 | 中 | 待补充 | 增加基本安全检查、依赖审计、访问日志监控 |
+
+## 13. 回归测试建议
+
+每次上线前建议至少执行：
+
+```bash
+npm run lint
+npm run build
+curl -I http://52.37.190.58/
+curl -I http://52.37.190.58/admin
+curl -u admin:admin123 -I http://52.37.190.58/admin
+curl -u admin:admin123 -I http://52.37.190.58/api/admin/posts
+```
+
+重点回归：
+
+1. 首页不展示 admin 入口。
+2. 后台未登录不可访问。
+3. 后台导航 active 状态正确。
+4. 发布文章后前台可见。
+5. 非发布状态文章前台不可见。
+6. AWS 原地部署后 IP 不变化。
+
+## 14. 测试结论
+
+当前版本核心链路通过：前台访问、后台访问保护、文章 CMS、PostgreSQL 数据读写、AWS 线上部署和后台导航状态均已验证通过。
+
+项目可以作为第一版内容管理型 Journal 网站继续使用。下一阶段建议优先完成 DOM 登录页面和富媒体富文本能力，因为这两项已经进入明确产品需求，并会直接影响后台使用体验。
