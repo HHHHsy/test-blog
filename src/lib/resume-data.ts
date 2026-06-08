@@ -1,0 +1,248 @@
+export type ResumeEntry = {
+  period: string;
+  company: string;
+  location: string;
+  title: string;
+  description?: string;
+  kind: "work" | "education" | "social";
+};
+
+export const resumeDataZh = {
+  education: [
+    {
+      period: "1998 — 2000",
+      company: "美国加利福尼亚大学",
+      location: "美国",
+      title: "工商管理硕士 (MBA)",
+      kind: "education" as const,
+    },
+  ],
+  social: [
+    {
+      period: "",
+      company: "国家标准化委员会",
+      location: "",
+      title: "特聘专家",
+      description: "参与多项国家服务标准的制定，包括学前教育标准、少儿语言培训标准和远程教育服务标准等。",
+      kind: "social" as const,
+    },
+    {
+      period: "",
+      company: "国际标准化组织 (ISO)",
+      location: "",
+      title: "特聘专家",
+      description: "参加国际教育服务规范标准的制定工作。",
+      kind: "social" as const,
+    },
+  ],
+  work: [
+    {
+      period: "1989 — 1993",
+      company: "鸭绿江造纸厂",
+      location: "辽宁",
+      title: "外经贸处副处长、进出口公司经理",
+      description: "国家大二级企业，员工过万人，生产新闻纸、牛皮纸等产品，为新华社长期供货商。",
+      kind: "work" as const,
+    },
+    {
+      period: "1993 — 1995",
+      company: "德国西门子公司广州办事处",
+      location: "广州",
+      title: "市场经理，轨道交通部",
+      description: "世界五百强公司，是上海地铁、广州地铁、深广高铁的主要设备供应商，是中国高铁和地铁技术的主要合作机构，为中国高铁和地铁运营培养了首批管理团队和监理团队。",
+      kind: "work" as const,
+    },
+    {
+      period: "1995 — 2000",
+      company: "Gindolar International Inc.",
+      location: "Los Angeles, USA",
+      title: "总经理",
+      description: "公司主营业务为进出口贸易，包括货物贸易和技术贸易，客户包括沃尔玛、西尔斯、家宝等零售企业，也包括福特、克莱斯勒等生产企业。",
+      kind: "work" as const,
+    },
+    {
+      period: "2000 — 2002",
+      company: "TransDimension, Inc.",
+      location: "Irvine, California, USA",
+      title: "销售经理",
+      description: "公司主营业务为半导体芯片设计，主打产品为USB主控器、蓝牙控制器等。客户包括日立、索尼、三星等近120家企业。",
+      kind: "work" as const,
+    },
+    {
+      period: "2003 — 2007",
+      company: "华尔街英语",
+      location: "北京",
+      title: "中心主任，国贸学习中心",
+      description: "公司隶属于华尔街英语国际公司，是中国市场高端英语培训的领导品牌，目前在中国拥有近70家直营培训中心。",
+      kind: "work" as const,
+    },
+    {
+      period: "2007 — 2009",
+      company: "麦维教育管理咨询",
+      location: "北京",
+      title: "总经理",
+      description: "中美合资的管理培训和管理咨询公司，为企业及政府机关提供管理培训课程及企业学习解决方案。",
+      kind: "work" as const,
+    },
+    {
+      period: "2009 — 2010",
+      company: "美国智拓管理咨询有限公司",
+      location: "北京",
+      title: "总经理，亚太区",
+      description: "美商独资管理培训和管理咨询公司，在世界各地20多个国家设有分支机构。",
+      kind: "work" as const,
+    },
+    {
+      period: "2010",
+      company: "美国华特迪士尼公司 · 迪士尼英语",
+      location: "上海",
+      title: "区域总监，华东区",
+      description: "华特迪士尼公司是世界500强公司。迪士尼英语专注于2到12岁孩子的英语学习。",
+      kind: "work" as const,
+    },
+    {
+      period: "2010 — 2011",
+      company: "美国巧口英语",
+      location: "北京",
+      title: "首席运营官 (COO)",
+      description: "美国耶鲁大学出版社合作机构，是美国Spelling Bee英语拼写大赛中国区公立学校承办单位。",
+      kind: "work" as const,
+    },
+    {
+      period: "2011 — 2012",
+      company: "精锐教育集团",
+      location: "北京",
+      title: "总经理，华北分公司",
+      description: "大型连锁直营教育机构，提供专业的一对一中小学生课外辅导，2018年在美国上市。",
+      kind: "work" as const,
+    },
+    {
+      period: "2012 — Present",
+      company: "Beijing Century My Way Education Technology Inc.",
+      location: "Beijing",
+      title: "Chief Executive Officer (CEO)",
+      description: "Management consulting firm serving SMEs with strategy, organizational design, operations, HR, sales, marketing, and risk management.",
+      kind: "work" as const,
+    },
+  ],
+};
+
+export const resumeDataEn = {
+  education: [
+    {
+      period: "1998 — 2000",
+      company: "University of California",
+      location: "USA",
+      title: "Master of Business Administration (MBA)",
+      kind: "education" as const,
+    },
+  ],
+  social: [
+    {
+      period: "",
+      company: "National Standardization Committee of China",
+      location: "",
+      title: "Appointed Expert",
+      description: "Participated in the development of multiple national service standards, including preschool education standards, children's language training standards, and distance education service standards.",
+      kind: "social" as const,
+    },
+    {
+      period: "",
+      company: "International Organization for Standardization (ISO)",
+      location: "",
+      title: "Appointed Expert",
+      description: "Participated in the development of international education service standards.",
+      kind: "social" as const,
+    },
+  ],
+  work: [
+    {
+      period: "1989 — 1993",
+      company: "Yalujiang Paper Mill",
+      location: "Liaoning, China",
+      title: "Deputy Division Chief, Foreign Trade & Import/Export Manager",
+      description: "National Grade-2 large enterprise with over 10,000 employees, producing newsprint and kraft paper as a long-term supplier to Xinhua News Agency.",
+      kind: "work" as const,
+    },
+    {
+      period: "1993 — 1995",
+      company: "Siemens AG — Guangzhou Office",
+      location: "Guangzhou, China",
+      title: "Marketing Manager, Rail Transportation Division",
+      description: "Fortune 500 company. Key equipment supplier for Shanghai Metro, Guangzhou Metro, and Guangzhou-Shenzhen high-speed rail. Trained China's first generation of metro and high-speed rail management and supervision teams.",
+      kind: "work" as const,
+    },
+    {
+      period: "1995 — 2000",
+      company: "Gindolar International Inc.",
+      location: "Los Angeles, USA",
+      title: "General Manager",
+      description: "Import/export trading company covering goods and technology trade. Clients included Wal-Mart, Sears, Kmart, Ford, and Chrysler.",
+      kind: "work" as const,
+    },
+    {
+      period: "2000 — 2002",
+      company: "TransDimension, Inc.",
+      location: "Irvine, California, USA",
+      title: "Sales Manager",
+      description: "Semiconductor chip design company specializing in USB controllers and Bluetooth controllers. Sole competitor was Philips. Clients included Hitachi, Sony, Samsung, and over 120 others.",
+      kind: "work" as const,
+    },
+    {
+      period: "2003 — 2007",
+      company: "Wall Street English",
+      location: "Beijing, China",
+      title: "Center Director, Guomao Learning Center",
+      description: "Premium English training brand under Wall Street English International. Currently operates nearly 70 direct-training centers across China.",
+      kind: "work" as const,
+    },
+    {
+      period: "2007 — 2009",
+      company: "My Way Education Management Consulting",
+      location: "Beijing, China",
+      title: "General Manager",
+      description: "Sino-US joint venture providing management training and consulting for enterprises and government agencies.",
+      kind: "work" as const,
+    },
+    {
+      period: "2009 — 2010",
+      company: "ZhiTuo Management Consulting Co., Ltd.",
+      location: "Beijing, China",
+      title: "General Manager, Asia Pacific",
+      description: "US-owned management training and consulting firm with offices in over 20 countries.",
+      kind: "work" as const,
+    },
+    {
+      period: "2010",
+      company: "The Walt Disney Company — Disney English",
+      location: "Shanghai, China",
+      title: "Regional Director, East China",
+      description: "Fortune 500 company. Disney English focused on English learning for children aged 2-12.",
+      kind: "work" as const,
+    },
+    {
+      period: "2010 — 2011",
+      company: "Qiaokou English (USA)",
+      location: "Beijing, China",
+      title: "Chief Operating Officer (COO)",
+      description: "Partner of Yale University Press. Official organizer of the Spelling Bee competition in Chinese public schools.",
+      kind: "work" as const,
+    },
+    {
+      period: "2011 — 2012",
+      company: "OneSmart International Education Group",
+      location: "Beijing, China",
+      title: "General Manager, North China Branch",
+      description: "Large chain K-12 tutoring organization. Listed on NYSE in April 2018 with nearly 200 learning centers across 30+ cities.",
+      kind: "work" as const,
+    },
+    {
+      period: "2012 — Present",
+      company: "Beijing Century My Way Education Technology Inc.",
+      location: "Beijing, China",
+      title: "Chief Executive Officer (CEO)",
+      description: "Management consulting firm serving SMEs with strategy, organizational design, operations, HR, sales, marketing, and risk management.",
+      kind: "work" as const,
+    },
+  ],
+};

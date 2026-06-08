@@ -1,0 +1,30 @@
+{
+  "en": {
+    "heroBadge": "Automated Premium Journal",
+    "heroTitle": "The quiet architecture of modern elegance.",
+    "heroCta": "Enter journal",
+    "sectionLabel": "Latest entries",
+    "sectionTitle": "Journal",
+    "sectionViewAll": "View all",
+    "newsletterBadge": "The Weekly Dispatch",
+    "newsletterTitle": "Notes on design, art, and the art of living well.",
+    "newsletterPlaceholder": "name@example.com",
+    "newsletterSubscribe": "Subscribe",
+    "siteName": "ELÉGANCE",
+    "footerDescription": "A premium journal for interiors, architecture, art, and considered living."
+  },
+  "zh": {
+    "heroBadge": "自动化高级期刊",
+    "heroTitle": "现代优雅的静谧建筑。",
+    "heroCta": "进入期刊",
+    "sectionLabel": "最新文章",
+    "sectionTitle": "期刊",
+    "sectionViewAll": "查看全部",
+    "newsletterBadge": "每周通讯",
+    "newsletterTitle": "关于设计、艺术和美好生活的随笔。",
+    "newsletterPlaceholder": "name@example.com",
+    "newsletterSubscribe": "订阅",
+    "siteName": "ELÉGANCE",
+    "footerDescription": "一本关于室内设计、建筑、艺术和精致生活的高端期刊。"
+  }
+}

@@ -9,13 +9,15 @@ function getPool() {
   if (!process.env.DATABASE_URL) return null;
   if (process.env.NEXT_PHASE === "phase-production-build") return null;
 
-  globalForPg.pgPool ??= new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 5000,
-    idleTimeoutMillis: 10000,
-    max: 3,
-  } satisfies PoolConfig);
+  if (!globalForPg.pgPool) {
+    globalForPg.pgPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: false,
+      connectionTimeoutMillis: 5000,
+      idleTimeoutMillis: 10000,
+      max: 3,
+    } satisfies PoolConfig);
+  }
 
   return globalForPg.pgPool;
 }
@@ -50,10 +52,19 @@ async function safeQuery<T>(query: (pool: Pool) => Promise<T>, fallback: T) {
   if (!pool) return fallback;
   try {
     return await query(pool);
-  } catch {
+  } catch (e) {
+    console.error("[DB ERROR]", e);
     return fallback;
   }
 }
+
+const SCHEMA = (() => {
+  try {
+    return new URL(process.env.DATABASE_URL ?? "").searchParams.get("schema") || "public";
+  } catch {
+    return "public";
+  }
+})();
 
 const postSelect = `
   select
@@ -69,7 +80,7 @@ const postSelect = `
     "scheduledAt",
     "createdAt",
     "updatedAt"
-  from "Post"
+  from ${SCHEMA}."Post"
 `;
 
 export async function getPublishedPosts() {
@@ -139,7 +150,7 @@ export async function createPost(input: PostInput) {
   const pool = getPool();
   if (!pool) throw new Error("DATABASE_URL is required for writes.");
   const result = await pool.query(
-    `insert into "Post"
+    `insert into ${SCHEMA}."Post"
       (id, title, slug, excerpt, "contentHtml", "coverImage", category, status, "publishedAt", "scheduledAt", "createdAt", "updatedAt")
      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now(), now())
      returning *`,
@@ -163,7 +174,7 @@ export async function updatePost(id: string, input: PostInput) {
   const pool = getPool();
   if (!pool) throw new Error("DATABASE_URL is required for writes.");
   const result = await pool.query(
-    `update "Post"
+    `update ${SCHEMA}."Post"
      set title = $2,
        slug = $3,
        excerpt = $4,
@@ -195,6 +206,41 @@ export async function updatePost(id: string, input: PostInput) {
 export async function deletePost(id: string) {
   const pool = getPool();
   if (!pool) throw new Error("DATABASE_URL is required for writes.");
-  await pool.query(`delete from "Post" where id = $1`, [id]);
+  await pool.query(`delete from ${SCHEMA}."Post" where id = $1`, [id]);
   return { id };
+}
+
+// ── Page Content ──
+
+export async function getPageContent(key: string): Promise<{ title: string; contentHtml: string } | null> {
+  return safeQuery(async (pool) => {
+    const result = await pool.query(
+      `select title, "contentHtml" from ${SCHEMA}."PageContent" where key = $1 limit 1`,
+      [key],
+    );
+    return result.rows[0] ?? null;
+  }, null);
+}
+
+export async function upsertPageContent(key: string, title: string, contentHtml: string) {
+  const pool = getPool();
+  if (!pool) throw new Error("DATABASE_URL is required for writes.");
+  const result = await pool.query(
+    `insert into ${SCHEMA}."PageContent" (id, key, title, "contentHtml", "updatedAt")
+     values ($1, $2, $3, $4, now())
+     on conflict (key)
+     do update set title = $3, "contentHtml" = $4, "updatedAt" = now()
+     returning *`,
+    [randomUUID(), key, title, contentHtml],
+  );
+  return result.rows[0];
+}
+
+export async function getAllPageKeys(): Promise<Array<{ key: string; title: string; updatedAt: Date }>> {
+  return safeQuery(async (pool) => {
+    const result = await pool.query(
+      `select key, title, "updatedAt" from ${SCHEMA}."PageContent" order by "updatedAt" desc`,
+    );
+    return result.rows;
+  }, []);
 }

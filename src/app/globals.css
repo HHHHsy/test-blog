@@ -24,16 +24,76 @@ body {
   color: white;
 }
 
-.prose h2 {
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  font-family: var(--font-playfair), Georgia, serif;
-  font-size: clamp(2rem, 5vw, 3rem);
-  line-height: 1.1;
+@layer components {
+  .prose {
+    overflow-wrap: break-word !important;
+  }
+
+  .prose p {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+  }
+
+  .prose h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-playfair), Georgia, serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .prose pre {
+    margin: 1.5rem 0;
+    padding: 0;
+    background: none;
+    border-left: 1px solid #d4af37;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    white-space: pre-wrap !important;
+  }
+
+  .prose pre code {
+    font-family: var(--font-playfair), Georgia, serif;
+    font-size: 1.1rem;
+    line-height: 1.9;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    white-space: pre-wrap !important;
+    background: none;
+    padding: 0;
+    font-style: italic;
+    color: inherit;
+  }
+
+  .prose code {
+    background: #f5f2ed;
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    font-size: 0.875em;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
 }
 
-.prose p {
-  margin-bottom: 1.5rem;
+.prose ul {
+  margin: 1.5rem 0;
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose strong {
+  font-weight: 700;
 }
 
 .prose blockquote {
@@ -44,6 +104,13 @@ body {
   font-size: 1.6rem;
   font-style: italic;
   line-height: 1.4;
+}
+
+.prose hr {
+  margin: 3rem auto;
+  border: none;
+  width: 60px;
+  border-top: 1px solid #d4af37;
 }
 
 .prose img {

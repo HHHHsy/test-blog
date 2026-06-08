@@ -7,7 +7,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
-import { Bold, FileUp, Heading2, ImageIcon, Italic, List, Paperclip, Quote, Save, Video } from "lucide-react";
+import { Bold, FileUp, Heading2, ImageIcon, Italic, List, Minus, Paperclip, Quote, Save, Undo2, Redo2, Video } from "lucide-react";
 import { AttachmentNode, VideoNode } from "@/lib/editor-media";
 
 const statuses: Array<{ value: PostStatus; label: string }> = [
@@ -144,7 +144,8 @@ export function PostEditor({ post }: { post?: Post | null }) {
     });
     setSaving(false);
     if (!response.ok) {
-      alert("Save failed. Check DATABASE_URL and PostgreSQL status.");
+      const body = await response.json().catch(() => null);
+      alert(body?.error || body?.detail || `Save failed (${response.status}). Check that the slug is unique.`);
       return;
     }
     router.push("/admin/posts");
@@ -173,6 +174,13 @@ export function PostEditor({ post }: { post?: Post | null }) {
           className="min-h-28 w-full border border-stone-200 bg-[#fbf9f9] px-4 py-3 text-sm leading-7 outline-none focus:border-[#d4af37]"
         />
         <div className="flex flex-wrap gap-2 border border-stone-200 bg-[#fbf9f9] p-2">
+          <button type="button" title="Undo" onClick={() => editor?.chain().focus().undo().run()} className="p-2 hover:bg-stone-100 disabled:opacity-30" disabled={!editor?.can().undo()}>
+            <Undo2 size={17} />
+          </button>
+          <button type="button" title="Redo" onClick={() => editor?.chain().focus().redo().run()} className="p-2 hover:bg-stone-100 disabled:opacity-30" disabled={!editor?.can().redo()}>
+            <Redo2 size={17} />
+          </button>
+          <span className="mx-1 h-9 w-px bg-stone-200" />
           <button type="button" title="Bold" onClick={() => editor?.chain().focus().toggleBold().run()} className="p-2 hover:bg-stone-100">
             <Bold size={17} />
           </button>
@@ -187,6 +195,9 @@ export function PostEditor({ post }: { post?: Post | null }) {
           </button>
           <button type="button" title="List" onClick={() => editor?.chain().focus().toggleBulletList().run()} className="p-2 hover:bg-stone-100">
             <List size={17} />
+          </button>
+          <button type="button" title="Divider (chapter break)" onClick={() => editor?.chain().focus().setHorizontalRule().run()} className="p-2 hover:bg-stone-100">
+            <Minus size={17} />
           </button>
           <span className="mx-1 h-9 w-px bg-stone-200" />
           <button type="button" title="Upload image" onClick={() => imageInputRef.current?.click()} className="p-2 hover:bg-stone-100">

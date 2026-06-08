@@ -19,11 +19,16 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = postSchema.parse(await request.json());
-  const post = await createPost({
-    ...body,
-    publishedAt: body.publishedAt ? new Date(body.publishedAt) : null,
-    scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
-  });
-  return NextResponse.json(post);
+  try {
+    const body = postSchema.parse(await request.json());
+    const post = await createPost({
+      ...body,
+      publishedAt: body.publishedAt ? new Date(body.publishedAt) : null,
+      scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
+    });
+    return NextResponse.json(post);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: "Save failed", detail: msg }, { status: 500 });
+  }
 }

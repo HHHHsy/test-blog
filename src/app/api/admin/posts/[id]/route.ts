@@ -15,14 +15,19 @@ const postSchema = z.object({
 });
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const body = postSchema.parse(await request.json());
-  const post = await updatePost(id, {
-    ...body,
-    publishedAt: body.publishedAt ? new Date(body.publishedAt) : null,
-    scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
-  });
-  return NextResponse.json(post);
+  try {
+    const { id } = await params;
+    const body = postSchema.parse(await request.json());
+    const post = await updatePost(id, {
+      ...body,
+      publishedAt: body.publishedAt ? new Date(body.publishedAt) : null,
+      scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
+    });
+    return NextResponse.json(post);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: "Save failed", detail: msg }, { status: 500 });
+  }
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {

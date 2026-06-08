@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import { getPostBySlug, getPublishedPosts } from "@/lib/data";
-import { formatDate } from "@/lib/utils";
 import { JournalCard } from "@/components/site/journal-card";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { DetailMeta, ContinueReading } from "./detail-text";
 
 export const dynamic = "force-dynamic";
 
@@ -19,11 +19,9 @@ export default async function EntryPage({ params }: { params: Promise<{ slug: st
       <main>
         <article className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">
-              {post.category} / {formatDate(post.publishedAt)}
-            </p>
-            <h1 className="mt-6 font-serif text-5xl leading-tight md:text-8xl">{post.title}</h1>
-            <p className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-stone-600">{post.excerpt}</p>
+            <DetailMeta category={post.category} publishedAt={post.publishedAt} />
+            <h1 className="mt-6 font-serif text-balance text-4xl leading-tight md:text-6xl">{post.title}</h1>
+            <p className="mx-auto mt-7 max-w-2xl break-words text-lg leading-8 text-stone-600">{post.excerpt}</p>
           </div>
           {post.coverImage ? (
             <div className="mt-14 aspect-[21/9] overflow-hidden bg-stone-200">
@@ -32,13 +30,13 @@ export default async function EntryPage({ params }: { params: Promise<{ slug: st
             </div>
           ) : null}
           <div
-            className="prose prose-stone mx-auto mt-14 max-w-3xl text-xl leading-9 text-stone-700"
-            dangerouslySetInnerHTML={{ __html: post.contentHtml }}
-          />
+          className="prose prose-stone mx-auto mt-14 max-w-3xl break-words text-xl leading-9 text-stone-700 [&_p]:![overflow-wrap:break-word] [&_p]:![word-break:break-word] [&_pre]:![white-space:pre-wrap] [&_pre]:![overflow-wrap:break-word] [&_code]:![white-space:pre-wrap]"
+          dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+        />
         </article>
         {related.length ? (
           <section className="mx-auto max-w-7xl border-t border-stone-200 px-5 py-16 md:px-8">
-            <p className="mb-8 text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">Continue reading</p>
+            <ContinueReading />
             <div className="grid gap-6 md:grid-cols-2">
               {related.map((item) => (
                 <JournalCard key={item.id} post={item} />

@@ -1,20 +1,25 @@
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { cookies } from "next/headers";
 import { getPublishedPosts } from "@/lib/data";
 import { JournalCard } from "@/components/site/journal-card";
 import { Newsletter } from "@/components/site/newsletter";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { HomeHeroText, HomeJournalHeader } from "./home-text";
+import { loadHomeData } from "@/lib/page-content";
+import type { Locale } from "@/i18n/dictionaries";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  const cookieStore = await cookies();
+  const locale: Locale = cookieStore.get("locale")?.value === "zh" ? "zh" : "en";
+  const homeData = await loadHomeData(locale);
   const posts = await getPublishedPosts();
   const [featured, ...rest] = posts;
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader siteName={homeData.siteName} />
       <main>
         <section className="relative min-h-[calc(100svh-5rem)] overflow-hidden bg-black text-white">
           {featured?.coverImage ? (
@@ -23,41 +28,22 @@ export default async function Home() {
           ) : null}
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/10" />
           <div className="relative mx-auto flex min-h-[calc(100svh-5rem)] max-w-7xl flex-col justify-end px-5 pb-16 pt-24 md:px-8">
-            <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/80">
-              Automated Premium Journal
-            </p>
-            <h1 className="max-w-5xl font-serif text-6xl leading-[0.95] md:text-8xl lg:text-9xl">
-              The quiet architecture of modern elegance.
-            </h1>
-            <Link
-              href="/journal"
-              className="mt-8 inline-flex w-fit items-center gap-2 border-b-2 border-[#d4af37] pb-2 text-[11px] font-semibold uppercase tracking-[0.22em]"
-            >
-              Enter journal <ArrowUpRight size={16} />
-            </Link>
+            <HomeHeroText data={homeData} />
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-5 py-20 md:px-8">
-          <div className="mb-10 flex items-end justify-between gap-6">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">Latest entries</p>
-              <h2 className="mt-4 font-serif text-5xl md:text-7xl">Journal</h2>
-            </div>
-            <Link href="/journal" className="hidden text-[11px] font-semibold uppercase tracking-[0.2em] md:block">
-              View all
-            </Link>
-          </div>
+        <section className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
+          <HomeJournalHeader data={homeData} />
           {featured ? <JournalCard post={featured} featured /> : null}
-          <div className="grid gap-2 md:grid-cols-2">
+          <div className="grid md:grid-cols-2 md:gap-x-12">
             {rest.slice(0, 2).map((post) => (
               <JournalCard key={post.id} post={post} />
             ))}
           </div>
         </section>
-        <Newsletter />
+        <Newsletter data={homeData} />
       </main>
-      <SiteFooter />
+      <SiteFooter description={homeData.footerDescription} />
     </>
   );
 }
